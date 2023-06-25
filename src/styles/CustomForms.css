@@ -1,0 +1,200 @@
+/* Custom text input style */
+.custom__input {
+  background: none;
+  width: 100%;
+}
+
+.floating {
+  width: 100%;
+  background-color: var(--field__background);
+  transition: background-color 0.2s ease;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: 1px solid var(--input__border);
+}
+
+.floating__input {
+  padding: 1.6rem 4rem 0.3rem 1rem;
+  color: #000;
+}
+
+.floating__input::placeholder {
+  color: rgba(0, 0, 0, 0);
+}
+
+.floating__label {
+  display: block;
+  position: relative;
+  max-height: 0;
+  font-weight: 400;
+  pointer-events: none;
+  color: var(--label__color);
+}
+
+.floating__label::before {
+  content: attr(data-content);
+  display: inline-block;
+  filter: blur(0);
+  backface-visibility: hidden;
+  transform-origin: left top;
+  transition: transform 0.2s ease;
+  left: 1rem;
+  position: relative;
+}
+
+.floating__label::after {
+  bottom: 1rem;
+  content: "";
+  height: 0.1rem;
+  position: absolute;
+  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+  opacity: 0;
+  left: 0;
+  top: 100%;
+  margin-top: -0.1rem;
+  transform: scale3d(0, 1, 1);
+  width: 100%;
+}
+
+.floating__input:placeholder-shown+.floating__label::before {
+  transform: translate3d(0, -2.2rem, 0) scale3d(1, 1, 1);
+}
+
+.floating__input:-webkit-autofill+.floating__label::before {
+  transform: translate3d(0, -3.12rem, 0) scale3d(0.82, 0.82, 1);
+}
+
+.floating__label::before,
+.floating__input:focus+.floating__label::before {
+  transform: translate3d(0, -3.12rem, 0) scale3d(0.82, 0.82, 1);
+}
+
+.floating__input__error {
+  color: var(--label__color__error) !important;
+}
+
+.floating__error {
+  border-bottom: 1px solid var(--label__color__error);
+}
+
+.hidden__visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+/* Custom radio style */
+.custom__radio>input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #A8ADB0;
+  border-radius: 50%;
+  background-clip: content-box;
+  padding: 3px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.custom__radio>input[type="radio"]:checked {
+  background-color: #00B464;
+  border-color: #00B464;
+}
+
+#radio__error {
+  border-color: var(--label__color__error);
+}
+
+/* Custom dropdown select style */
+.dropdown__input {
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  cursor: pointer;
+  padding: 1.6rem 0.5rem 0.3rem 1rem;
+}
+
+.dropdown__input-placeholder {
+  color: var(--label__color);
+  padding: 0.95rem 0.5rem 0.95rem 1rem;
+}
+
+.dropdown__menu {
+  position: absolute;
+  transform: translateY(2px);
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 250px;
+  background-color: #4829AA;
+  color: white;
+  z-index: 10;
+  box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.04), 0px 6px 10px rgba(115, 117, 118, 0.2);
+}
+
+.dropdown__item {
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.dropdown__item:hover {
+  background-color: #1F155F;
+}
+
+.dropdown__item-selected {
+  background-color: #1F155F;
+}
+
+/* Custom file upload input style */
+.file-upload__container {
+  padding: 24px;
+  height: 80px;
+  background-color: #F7F7F7;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-upload__error {
+  border-bottom: 1px solid var(--label__color__error);
+  color: var(--label__color__error);
+}
+
+.file-upload__button {
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #4829AA;
+  height: 32px;
+  width: 124px;
+  cursor: pointer;
+  border-radius: 100px;
+  transition: all 0.5s ease;
+}
+
+.file-upload__button:hover {
+  box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.04), 0px 6px 10px rgba(115, 117, 118, 0.2);
+}
+
+.file-upload__replace {
+  margin-left: 8px;
+  color: #4829AA;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.5s ease;
+}
+
+.file-upload__replace:hover {
+  color: #1F155F;
+}

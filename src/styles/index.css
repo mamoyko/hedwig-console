@@ -1,0 +1,38 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Avenir" !important;
+  font-style: normal !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*:focus {
+  outline: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: black;
+  }
+}
+
+/* All reusable variables for custom css */
+:root {
+  --field__background: #F7F7F7;
+  --input__border: #A8ADB0;
+  --label__color: #737A7D;
+  --label__color__error: #F04747;
+  --font__size: 16px;
+}

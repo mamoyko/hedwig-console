@@ -1,0 +1,112 @@
+stages:
+  - pre-build
+  - build
+  - post-build
+  - test
+
+include:
+  - project: isse/service-engineering/gitlab-ci-templates
+    ref: main
+    file:
+      - security/snyk.gitlab-ci.yml
+      - security/sonar-scanner.gitlab-ci.yml
+
+#-------------------#
+# Stage: Pre Build  #
+#-------------------#
+
+eslint:
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18.12.1-buster
+  stage: pre-build
+  before_script:
+    - npm install eslint@8.33.0
+    - npm install eslint-plugin-react
+  script:
+    - npm run lint
+  only:
+    - merge_requests
+    - tags
+
+unit-test:
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18.12.1-buster
+  stage: pre-build
+  before_script:
+    - npm install
+  script:
+    - npm run test:test -- --coverage
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    expire_in: 1 days
+    when: on_success
+    paths:
+      - node_modules
+      - coverage
+  only:
+    - merge_requests
+    - tags
+
+code-quality:
+  stage: pre-build
+  needs: ["unit-test"]
+  extends: .sonar-scanner
+  variables:
+    SONAR_PROJECT_KEY: $CI_PROJECT_NAME
+    SONAR_LOGIN: $SONAR_TOKEN
+    SONAR_PROJECT_BASE_DIR: $PROJECT_DIR
+  only:
+    - merge_requests
+    - tags
+
+sast:
+  stage: pre-build
+  extends: .snyk:code
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18.12.1-buster
+  allow_failure: true
+  only:
+    - merge_requests
+    - tags
+
+sca:
+  stage: pre-build
+  extends: .snyk:sca
+  variables:
+    SNYK_PROJECT_NAME: $CI_PROJECT_NAME
+    SNYK_SCAN_DIR: $CI_PROJECT_DIR
+  only:
+    - merge_requests
+    - tags
+
+#-------------------#
+# Stage: Build      #
+#-------------------#
+
+build:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/docker:20.10.17
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/docker:20.10.17-dind
+      alias: docker
+      command: ["--tls=false"]
+  script:
+    - echo -n ${CI_DEPENDENCY_PROXY_PASSWORD} | docker login -u ${CI_DEPENDENCY_PROXY_USER} --password-stdin ${CI_DEPENDENCY_PROXY_SERVER}
+    - docker build --no-cache --build-arg dproxy_url=${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX} -t registry.gitlab.corp.paymaya.com/core/growth/messaging-platform/communications-mesh-team/hedwig-console-fe:${CI_COMMIT_REF_NAME} .
+    - echo -n ${CI_REGISTRY_PASSWORD} | docker login -u ${CI_REGISTRY_USER} --password-stdin registry.gitlab.corp.paymaya.com
+    - docker push registry.gitlab.corp.paymaya.com/core/growth/messaging-platform/communications-mesh-team/hedwig-console-fe:${CI_COMMIT_REF_NAME}
+  only:
+    - tags
+
+#-------------------#
+# Stage: Post Build #
+#-------------------#
+
+container-scanning:
+  stage: post-build
+  needs: ["build"]
+  extends: .snyk:container
+  variables:
+    SNYK_CONTAINER_TAG: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}
+  only:
+    - tags
